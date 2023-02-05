@@ -5,6 +5,7 @@ class Grafo(object):
 
     def __init__(self, vertices): 
         # Construtor/Inicializador do grafo
+        # Declara uma lista para cada característica do vértice onde um índice i da lista representa um vértice i do grafo
         self.vertices = vertices                            # Número de vértices
         self.ciclico = False                                # Inicializa Grafo como acíclico
         self.adj = [[] for i in range(self.vertices)]       # Lista de Adjacências de cada vértice
@@ -35,7 +36,7 @@ class Grafo(object):
     def mostraDFS(self):
         # Mostra caracteristicas dos vértices baseado no algoritimo DFS (cor, tempo descoberta/término, pai)
         for i in range(self.vertices):
-            print(f'vértice {i} : [cor = {self.cor[i]}, tempo de descoberta/término = {self.desc[i]}/{self.termino[i]}, pai = {self.pai[i]}]')
+            print(f'vértice {i} : [cor = {self.cor[i]}, descoberta/término = {self.desc[i]}/{self.termino[i]}, pai = {self.pai[i]}]')
 
 
 def BFS(g, s):                                  # Recebe Grafo g e vértice inicial s
@@ -85,7 +86,7 @@ def DFSVisit(g, u, tempo):
 
 
 # Algoritimo que verifica se um grafo g é uma árvore ou não
-# Se o numero de vértices com pai = NULO for maior do que 1 após a execução do DFS, então o grafo NÃO É CONEXO
+# Se o número de vértices com pai = NULO for maior do que 1 após a execução do DFS, então o grafo NÃO É CONEXO
 # Um grafo só é considerado árvore se for CONEXO e ACÍCLICO
 def isTree(g):
     DFS(g)                                      # Aplica DFS em g
@@ -98,6 +99,7 @@ def isTree(g):
     else:                                       
         return False
 
+
 # Algoritimo para cálculo do diâmetro de uma árvore
 def diametro(t):
     if not isTree(t):                           # Se isTree(t) é falso então o algoritimo não é executado e retorna -1
@@ -106,18 +108,20 @@ def diametro(t):
     BFS(t, s)                                   # Aplica BFS em t com vértice inicial s
     a = t.dist.index(max(t.dist))               # a recebe o vértice com o máximo valor de distância
     BFS(t, a)                                   # Aplica BFS em t com vértice inicial a
-    return max(t.dist)                          # Retorna o maximo valor de distância obtido a partir de a
+    return max(t.dist)                          # Retorna a distância do vértice mais distante de a
 
 
 def main():
     '''
-    Representação do grafo de exemplo:
+    Representação do grafo de exemplo 1:
     0---1   2---3 
     |   | ̷  | ̷  |
     4   5---6---7
+     - Cíclico
+     - Conexo
     '''
+    # Contrução do grafo
     g = Grafo(8)
-
     g.addAresta(0,1)
     g.addAresta(0,4)
     g.addAresta(1,5)
