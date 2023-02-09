@@ -1,4 +1,5 @@
-import math, random
+import math, random                 #math é usado para valores infinitos; random para obter um vértice aleatório em BFS
+from collections import deque       #deque é uma implementação de fila que funciona em tempo constante
 
 class Grafo(object):
 
@@ -9,8 +10,6 @@ class Grafo(object):
         self.cor = [[] for i in range(self.vertices)]       # Lista de cores de cada vértice
         self.dist = [[] for i in range(self.vertices)]      # Lista de distância de cada vértice
         self.pai = [[] for i in range(self.vertices)]       # Lista de pai de cada vértice
-        self.desc = [[] for i in range(self.vertices)]      # Lista de tempo de descoberta de cada vértice
-        self.termino = [[] for i in range(self.vertices)]   # Lista de tempo de término de cada vértice
     
     def addAresta(self, u, v):
         # Adição de uma aresta entre o vértice u e o vértice v
@@ -42,9 +41,10 @@ def BFS(g, s):
     g.cor[s] = 'C'                              # Cor do vértice inicial = CINZA
     g.dist[s] = 0                               
     g.pai[s] = None                            
-    q = [s]                                     # Fila 'q' onde o primeiro vértice será visitado e eliminado da fila e seus vértices filhos serão adicionados ao final da fila
-    while q != []:                              
-        u = q.pop(0)                            
+    q = deque()
+    q.append(s)                                 # Fila 'q' onde o primeiro vértice será visitado e eliminado da fila e seus vértices filhos serão adicionados ao final da fila
+    while q != deque([]):                             
+        u = q.popleft()                            
         for v in g.adj[u]:                      
             if g.cor[v] == 'B':                 
                 g.cor[v] = 'C'                  
@@ -118,8 +118,6 @@ def main():
     assert len(g.cor) == 8
     assert len(g.dist) == 8
     assert len (g.pai) == 8
-    assert len (g.desc) == 8
-    assert len (g.termino) == 8
     
     # Assert para addAresta e mostraAdj
     assert g.adj[0] == [1,4]
@@ -132,11 +130,16 @@ def main():
     assert g.adj[7] == [3,6]
     
     # Assert para BFS
-    BFS(g, 0)
-    assert g.cor[0] == 'P'                      
-    assert g.dist[7] == 4                 
-    assert g.pai[4] == 0
+    BFS(g, 1)
+    g.mostraAdj()
+    g.mostraBFS()
+    for cor in g.cor:
+        assert cor == 'P'
+    assert g.dist[0] == 1, g.pai == 1
     
+    # Assert para isCyclic
+    assert isCyclic(g) == True
+
     # Assert para isTree
     assert isTree(g) == False
     
