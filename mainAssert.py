@@ -1,13 +1,10 @@
 import math, random
 
-# Classe que define um objeto do tipo Grafo
 class Grafo(object):
 
     def __init__(self, vertices): 
-        # Construtor/Inicializador do grafo
         # Declara uma lista para cada característica do vértice onde um índice i da lista representa um vértice i do grafo
         self.vertices = vertices                            # Número de vértices
-        self.ciclico = False                                # Inicializa Grafo como acíclico
         self.adj = [[] for i in range(self.vertices)]       # Lista de Adjacências de cada vértice
         self.cor = [[] for i in range(self.vertices)]       # Lista de cores de cada vértice
         self.dist = [[] for i in range(self.vertices)]      # Lista de distância de cada vértice
@@ -17,105 +14,87 @@ class Grafo(object):
     
     def addAresta(self, u, v):
         # Adição de uma aresta entre o vértice u e o vértice v
-        self.adj[u].append(v)   # Adiciona v na lista de adjacências de u
-        self.adj[v].append(u)   # Adiciona u na lista de adjacências de v
+        self.adj[u].append(v)   
+        self.adj[v].append(u)   
     
     def mostraAdj(self):
         # Mostra lista de adjacências
         for i in range(self.vertices):
-            print(f'{i} => ', end='')               # Mostra vértice i
-            for aresta in self.adj[i]:              # Mostra adjacências do vértice i
+            print(f'{i} => ', end='')               
+            for aresta in self.adj[i]:              
                 print(f'[{aresta}] => ', end='')    
-            print('/')                              # Pula Linha
+            print('/')                              
 
     def mostraBFS(self):
         # Mostra caracteristicas dos vértices baseado no algoritimo BFS (cor, distancia, pai)
         for i in range(self.vertices):
             print(f'vértice {i} : [cor = {self.cor[i]}, distância = {self.dist[i]}, pai = {self.pai[i]}]')
-    
-    def mostraDFS(self):
-        # Mostra caracteristicas dos vértices baseado no algoritimo DFS (cor, tempo descoberta/término, pai)
-        for i in range(self.vertices):
-            print(f'vértice {i} : [cor = {self.cor[i]}, descoberta/término = {self.desc[i]}/{self.termino[i]}, pai = {self.pai[i]}]')
 
 
-def BFS(g, s):                                  # Recebe Grafo g e vértice inicial s
-    for u in range(g.vertices):                 # Percorre os vértices do grafo g
-        if u != s:                              # Se u é diferente de s, inicializa cor = BRANCO, distância = INFINITO e pai = NULO
+# Busca em largura que define distância dos vértices com relação a um vértice inicial 's'
+# Usada para cálculo do diâmetro de uma árvore
+def BFS(g, s):                                  
+    for u in range(g.vertices):                 # Reseta todos os vértices para BRANCO e dist = infinito
+        if u != s:                              
             g.cor[u] = 'B'                      
             g.dist[u] = math.inf                
             g.pai[u] = None                    
-    g.cor[s] = 'C'                              
-    g.dist[s] = 0                               # Inicializa vértice s com cor CINZA, distância 0 e pai NULO
+    g.cor[s] = 'C'                              # Cor do vértice inicial = CINZA
+    g.dist[s] = 0                               
     g.pai[s] = None                            
-    q = [s]                                     # Declara uma fila q e insere s
-    while q != []:                              # Enquanto fila q não for vazia
-        u = q.pop(-1)                           # Retira vértice da fila e guarda ele em u
-        for v in g.adj[u]:                      # Para cada v adjacente de u
-            if g.cor[v] == 'B':                 # Se v for BRANCO
-                g.cor[v] = 'C'                  # Define v como CINZA
-                g.dist[v] = g.dist[u] + 1       # Define distancia de v como distancia de u + 1
-                g.pai[v] = u                    # Pai de v recebe u
-                q.append(v)                     # Adiciona vértice v na fila q
+    q = [s]                                     # Fila 'q' onde o primeiro vértice será visitado e eliminado da fila e seus vértices filhos serão adicionados ao final da fila
+    while q != []:                              
+        u = q.pop(0)                            
+        for v in g.adj[u]:                      
+            if g.cor[v] == 'B':                 
+                g.cor[v] = 'C'                  
+                g.dist[v] = g.dist[u] + 1       # Vértices descobertos recebem a distância de seu pai + 1
+                g.pai[v] = u                    
+                q.append(v)                     
         g.cor[u] = 'P'                          # Define cor de u como PRETO
 
 
-# Algoritimo de busca em profundidade usado para verificar se um grafo é uma árvore
-def DFS(g):                                     # Recebe o grafo g
-    for u in range(g.vertices):                 # Para cada vértice u de g defina cor = BRANCO e pai = NULO
-        g.cor[u] = 'B'
-        g.pai[u] = None
-    tempo = 0                                   # Inicializa contagem de tempo em zero
-    for u in range(g.vertices):                 # Visita cada vértice branco restante no grafo
-        if g.cor[u] == 'B':
-            tempo = DFSVisit(g, u, tempo)
-def DFSVisit(g, u, tempo):
-    tempo += 1
-    g.desc[u] = tempo                           # Tempo de descoberta do vértice visitado u recebe tempo
-    g.cor[u] = 'C'                              # Cor do vértice visitado u recebe CINZA
-    for v in g.adj[u]:                          # Para cada v adjacente de u:
-        if g.cor[v] == 'B':                     # Se v é BRANCO defina pai como u e visite v
-            g.pai[v] = u
-            tempo = DFSVisit(g, v, tempo)
-        elif v != g.pai[u]:                     # Se v não é BRANCO e v não é pai de u, então o grafo é cíclico
-            g.ciclico = True
-    g.cor[u] = 'P'                              # Cor de u recebe PRETO
-    tempo += 1
-    g.termino[u] = tempo                        # Tempo de término de u recebe tempo
-    return tempo                                # Retorna tempo para que a variavel tempo seja atualizada na função anterior
+# Retorna True se o grafo é CÍCLICO e False se é ACÍCLICO
+def isCyclic(g):
+    arestas = 0
+    for u in g.adj:                             # Soma todas as adjacências do grafo e as divide por 2, isto nos da o numero de arestas do grafo
+        arestas += len(u)                       
+    arestas = arestas/2
+    if arestas > (g.vertices-1):                # Se o número de arestas do grafo é maior do que o número de vértices + 1, então o grafo é CÍCLICO, senão é ACÍCLICO
+        return True
+    else:
+        return False
 
 
-# Algoritimo que verifica se um grafo g é uma árvore ou não
-# Se o número de vértices com pai = NULO for maior do que 1 após a execução do DFS, então o grafo NÃO É CONEXO
-# Um grafo só é considerado árvore se for CONEXO e ACÍCLICO
-def isTree(g):
-    DFS(g)                                      # Aplica DFS em g
-    count = 0                                   # Inicializa um contador em 0
-    for u in range(g.vertices):                 # Para cada vértice u de g:
+# Se o grafo é uma árvore retorna TRUE, senão retorna FALSE
+def isTree(g):                              
+    count = 0
+    for u in range(g.vertices):                 # Se o número de vértices com pai = NULO for maior do que 1 após a execução do BFS, então o grafo NÃO É CONEXO
         if g.pai[u] == None:                    
-            count += 1                          # Se pai de u for igual a NULO, adiciona 1 ao contador
-    if g.ciclico == False and count < 2:        # Se g é acíclico e contador de vértices com pai = NULO é menor que 2: retorna verdadeiro
+            count += 1                         
+    if not isCyclic(g) and count < 2:           # Retorna TRUE somente se g for CONEXO e ACÍCLICO
         return True                          
     else:                                       
         return False
 
 
-# Algoritimo para cálculo do diâmetro de uma árvore
+# Calcula o diâmetro de uma árvore t
+# O diâmetro de uma árvore é o caminho mais longo possível entre dois vértices
 def diametro(t):
-    if not isTree(t):                           # Se isTree(t) é falso então o algoritimo não é executado e retorna -1
+    s = random.randint(0, t.vertices-1)         
+    BFS(t, s)                                  
+    if not isTree(t):                           # Se isTree(t) é falso então o algoritimo não é executado porque o grafo não é uma árvore
         return -1
-    s = random.randint(0, t.vertices-1)         # s recebe um vértice aleatório de t
-    BFS(t, s)                                   # Aplica BFS em t com vértice inicial s
-    a = t.dist.index(max(t.dist))               # a recebe o vértice com o máximo valor de distância
-    BFS(t, a)                                   # Aplica BFS em t com vértice inicial a
-    return max(t.dist)                          # Retorna a distância do vértice mais distante de a
+    a = t.dist.index(max(t.dist))               # A partir de qualquer vértice no grafo, aplicamos BFS e obtemos o vértice mais distante possível e damos a ele o nome de 'a'
+    BFS(t, a)                                   # A distância de 'a' até o seu vértice mais distante nos da o diâmetro da árvore 
+    return max(t.dist)                          
 
 
 def main():
     '''
     Representação do grafo de exemplo 1:
     0---1   2---3 
-    |   |  ̷  |  ̷  |
+    |   | ̷  | ̷  |
     4   5---6---7
      - Cíclico
      - Conexo
@@ -143,7 +122,7 @@ def main():
     assert len (g.termino) == 8
     
     # Assert para addAresta e mostraAdj
-    assert g.adj[0] == [1,4] #pode ser outra lista, depende da ordem em que as arestas foram adicionadas
+    assert g.adj[0] == [1,4]
     assert g.adj[1] == [0,5] 
     assert g.adj[2] == [5,6,3] 
     assert g.adj[3] == [2,6,7] 
@@ -157,14 +136,6 @@ def main():
     assert g.cor[0] == 'P'                      
     assert g.dist[7] == 4                 
     assert g.pai[4] == 0
-    
-    # Assert para DFS e DFSVisit
-    DFS(g)
-    assert g.cor[7] == 'P'
-    assert g.pai[5] == 1
-    assert g.desc[4] == 14 #pode ser 2, mas depende da ordem em que as arestas foram adicionadas
-    assert g.termino[3] == 9 #pode ser 6 ou 7, mas depende da ordem em que as arestas foram adicionadas
-    assert g.ciclico == True
     
     # Assert para isTree
     assert isTree(g) == False
@@ -202,8 +173,8 @@ def main():
     '''
     Representação do grafo de exemplo 4:
     0---1---2---3---4
-	    |
-            5---6---7
+	      ̷  |
+        8   5---6---7
      - Acíclico
      - Conexo
     '''
@@ -225,13 +196,9 @@ def main():
     assert diametro(j) == 5
 
     # Exemplo de função que imprime lista de adjacência
-    j.mostraAdj()
+    #j.mostraAdj()
     # Exemplo de função que mostra características com base no algoritimo BFS
-    j.mostraBFS()
-    print()
-    DFS(j)
-    # Exemplo de função que mostra características com base no algoritimo DFS
-    j.mostraDFS()
+    #j.mostraBFS()
 
 
 if __name__== "__main__" :  
