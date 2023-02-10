@@ -54,28 +54,26 @@ def BFS(g, s):
         g.cor[u] = 'P'                          # Define cor de u como PRETO
 
 
-# Retorna True se o grafo é CÍCLICO e False se é ACÍCLICO
-def componentIsCyclic(g):
-    arestas = 0
-    for u in g.adj:                             # Soma todas as adjacências do grafo e as divide por 2, isto nos da o numero de arestas do grafo
-        arestas += len(u)                       
-    arestas = arestas/2
-    if arestas > (g.vertices-1):                # Se o número de arestas do grafo é maior do que o número de vértices + 1, então o grafo é CÍCLICO, senão é ACÍCLICO
-        return True
-    else:
-        return False
-
-
 # Se o grafo é uma árvore retorna TRUE, senão retorna FALSE
-def isTree(g):                              
+# Retorna True se o grafo é CONEXO e ACÍCLICO
+def isTree(g): 
+    # Verifica se é CONEXO                             
     count = 0
-    for u in range(g.vertices):                 # Se o número de vértices com pai = NULO for maior do que 1 após a execução do BFS, então o grafo NÃO É CONEXO
+    for u in range(g.vertices):                     # Se o número de vértices com pai = NULO for maior do que 1 após a execução do BFS, então o grafo NÃO É CONEXO
         if g.pai[u] == None:                    
             count += 1                         
-    if not componentIsCyclic(g) and count < 2:           # Retorna TRUE somente se g for CONEXO e ACÍCLICO
-        return True                          
-    else:                                       
+    if count > 1:                                   # Retorna FALSE se o grafo é DESCONEXO
         return False
+    # Se é CONEXO então verifica se é ACÍCLICO                          
+    else:                                       
+        arestas = 0
+        for u in g.adj:                             # Soma todas as adjacências do grafo e as divide por 2, isto nos da o numero de arestas do grafo
+            arestas += len(u)                       
+        arestas = arestas/2
+        if arestas > (g.vertices-1):                # Se o número de arestas do grafo é maior do que o número de vértices + 1, então o grafo é CÍCLICO, senão é ACÍCLICO
+            return False
+        else:
+            return True
 
 
 # Calcula o diâmetro de uma árvore t
@@ -152,9 +150,6 @@ def main():
         assert g.dist[7] == 3 
         assert g.pai[7] == 6
 
-    # Assert para componentIsCyclic
-    assert componentIsCyclic(g) == True
-
     # Assert para isTree
     assert isTree(g) == False
     
@@ -220,9 +215,6 @@ def main():
     assert h.dist[7] == math.inf 
     assert h.pai[7] == None
     
-    # Assert para componentIsCyclic
-    assert componentIsCyclic(h) == False
-    
     # Assert para BFS (segunda componente)
     BFS(h, 1)
     ##h.mostraBFS()
@@ -252,9 +244,6 @@ def main():
     assert h.dist[7] == math.inf 
     assert h.pai[7] == None
     
-    # Assert para componentIsCyclic
-    assert componentIsCyclic(h) == False
-    
     # Assert para BFS (terceira componente)
     BFS(h, 3)
     ##h.mostraBFS()
@@ -283,9 +272,6 @@ def main():
     assert h.cor[7] == 'B'
     assert h.dist[7] == math.inf 
     assert h.pai[7] == None
-    
-    # Assert para componentIsCyclic
-    assert componentIsCyclic(h) == False
 
     # Assert para BFS (quarta componente)
     BFS(h, 5)
@@ -316,9 +302,6 @@ def main():
     assert h.dist[7] == math.inf 
     assert h.pai[7] == None
     
-    # Assert para componentIsCyclic
-    assert componentIsCyclic(h) == False
-    
     # Assert para BFS (quinta componente)
     BFS(h, 6)
     ##h.mostraBFS()
@@ -347,9 +330,6 @@ def main():
     assert h.cor[7] == 'P'
     assert h.dist[7] == 1 
     assert h.pai[7] == 6
-    
-    # Assert para isCyclic
-    assert componentIsCyclic(h) == False
 
     # Assert para isTree
     assert isTree(h) == False
@@ -418,9 +398,6 @@ def main():
     assert i.dist[6] == math.inf
     assert i.pai[6] == None
     
-    # Assert para isCyclic
-    assert componentIsCyclic(i) == True #aqui está dando falso, mas é verdadeiro, pois a componente é cíclica
-    
     # Assert para BFS (segunda componente)
     BFS(i, 4)
     ##i.mostraBFS()
@@ -446,9 +423,6 @@ def main():
     assert i.cor[6] == 'P'
     assert i.dist[6] == 1
     assert i.pai[6] == 4
-    
-    # Assert para isCyclic
-    assert componentIsCyclic(i) == False
 
     # Assert para isTree
     assert isTree(i) == False
