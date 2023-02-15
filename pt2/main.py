@@ -1,4 +1,4 @@
-import math, random, time           #math é usado para valores infinitos; random para obter um vértice aleatório em BFS
+import math, random, time           #math é usado para valores infinitos; random para obter um vértice aleatório em BFS; time para cálculo de tempo
 from collections import deque       #deque é uma implementação de fila que funciona em tempo constante
 
 class Grafo(object):
@@ -15,22 +15,9 @@ class Grafo(object):
     def addAresta(self, u, v):
         # Adição de uma aresta entre o vértice u e o vértice v
         self.adj[u].append(v)   
-        self.adj[v].append(u)   
+        self.adj[v].append(u)                          
+
     
-    def mostraAdj(self):
-        # Mostra lista de adjacências
-        for i in range(self.vertices):
-            print(f'{i} => ', end='')               
-            for aresta in self.adj[i]:              
-                print(f'[{aresta}] => ', end='')    
-            print('/')                              
-
-    def mostraBFS(self):
-        # Mostra caracteristicas dos vértices baseado no algoritimo BFS (cor, distancia, pai)
-        for i in range(self.vertices):
-            print(f'vértice {i} : [cor = {self.cor[i]}, distância = {self.dist[i]}, pai = {self.pai[i]}]')
-
-
 # Busca em largura que define distância dos vértices com relação a um vértice inicial 's'
 # Usada para cálculo do diâmetro de uma árvore
 def BFS(g, s):                                  
@@ -80,7 +67,7 @@ def isTree(g):
 # Calcula o diâmetro de uma árvore t
 # O diâmetro de uma árvore é o caminho mais longo possível entre dois vértices
 def diametro(t):
-    s = random.randint(0, t.vertices-1)         
+    s = random.randint(0, t.vertices-1)     	# Gera um indice aleatório da lista de vértices
     BFS(t, s)                                  
     if not isTree(t):                           # Se isTree(t) é falso então o algoritimo não é executado porque o grafo não é uma árvore
         raise ValueError('Not tree')
@@ -89,14 +76,16 @@ def diametro(t):
     return max(t.dist)
 
 
+# Gera árvores aleatórias de n vértices
+# Uma árvore é um grafo acíclico e conexo
 def RandomTreeRandomWalk(n):
     g = Grafo(n)
-    for u in range(n):
+    for u in range(n):                                                  # Inicializa todos vértices como não visitados
         g.visitado[u] = False
-    u = random.randint(0, n-1)
+    u = random.randint(0, n-1)                                          # Gera um indice aleatório da lista de vértices                           
     g.visitado[u] = True
     count = 0
-    while count < n-1:
+    while count < n-1:                                                  # Adiciona arestas válidas até que o número de arestas seja n - 1
         v = random.randint(0, n-1)
         if g.visitado[v] == False and v not in g.adj[u] and v != u:
             g.addAresta(u,v)
@@ -105,18 +94,20 @@ def RandomTreeRandomWalk(n):
         u = v
     return g
 
+
 def main():
     with open('randomwalk.txt', 'w') as arq:
-        n = 250
-        soma = 0
+        n = 250                                                     # Número de arestas
+        soma = 0                                                    # Soma dos diâmetros
         for i in range(8):
-            inicio = time.time()
+            inicio = time.time()                                    # Função para contagem do tempo de execução
             for j in range(500):
                 g = RandomTreeRandomWalk(n)
                 soma += diametro(g)
             fim = time.time()
             print(f'{n} {soma/500}\ttempo: %.2fs' % (fim-inicio))
-            print(f'{n} {soma/500}', file=arq)
+            print(f'{n} {soma/500}', file=arq)                      # Escreve os resutados no arquivo randomwalk.txt
+            soma = 0
             n += 250
 
 
