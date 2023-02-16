@@ -496,23 +496,19 @@ def main():
 
 
     with open('randomwalk.txt', 'w') as arq:
-        t = 0                                                       # Variavel para cálculo do tempo
-        for n in range(250, 2250, 250):
-            array = [] 
-
-            inicio = time.time()                                    # Função para contagem do tempo de execução
+        t = 0                                                           # Variavel para cálculo do tempo
+        for n in range(250, 2001, 250):
+            tempo, soma = 0, 0
             for j in range(500):
-                g = RandomTreeRandomWalk(n)                         # Gera 500 árvores com n vértices
-                array.append(g)
-            fim = time.time()
-            t += (fim-inicio)
+                inicio = time.time()                                    # Função para contagem do tempo de execução
+                g = RandomTreeRandomWalk(n)                             # Gera 500 árvores com n vértices
+                fim = time.time()
+                soma += diametro(g)                                     # Calculo dos diâmetros
+                tempo += (fim-inicio) 
 
-            soma = 0
-            for g in array:
-                soma += diametro(g)                                 # Calculo dos diâmetros
-
-            print(f'{n} {soma/500}\ttempo: %.2fs' % (fim-inicio))
-            print(f'{n} {soma/500}', file=arq)                      # Escreve os resutados no arquivo randomwalk.txt
+            print(f'{n} {soma/500}\ttempo: %.2fs' % tempo)
+            print(f'{n} {soma/500}', file=arq)                                    # Escreve os resutados no arquivo randomwalk.txt
+            t += tempo
         print('tempo total: %.2fs' % t)
 
 if __name__== "__main__" :  
